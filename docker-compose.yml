@@ -1,27 +1,30 @@
-version: '2.4'
-
+version: "3"
 services:
   postgres:
     image: postgres:12
     container_name: hds-postgres
     restart: always
     environment:
-      POSTGRES_USER: 'postgres'
-      POSTGRES_DB: 'postgres'
-      POSTGRES_PASSWORD: 'password'
-      
+      POSTGRES_USER: malik
+      POSTGRES_DB: ecom
+      POSTGRES_PASSWORD: pass1234
+
   django:
     build: ./django
     container_name: hds-django
     restart: always
     depends_on:
-      - 'postgres'
+      - postgres
     volumes:
       - ./django:/code
     environment:
       PYTHONUNBUFFERED: 1
+      POSTGRES_USER: malik
+      POSTGRES_DB: ecom
+      POSTGRES_PASSWORD: pass1234
+      POSTGRES_HOST: postgres
       # Any $ in your secret key needs another $ for interpolation. > ex. `...4v$0n^c...` becomes `...4v$$0n^c...` (read readme.md)
-      DJANGO_SECRET: 'T2uy8pg3OjW26TdngnPA3LjuPlthW8AH6xIOBXu9oFs'
+      DJANGO_SECRET: "T2uy8pg3OjW26TdngnPA3LjuPlthW8AH6xIOBXu9oFs"
     ports:
       - "127.0.0.1:8000:8000"
 
@@ -35,16 +38,15 @@ services:
     container_name: hds-hasura
     restart: always
     depends_on:
-      - 'postgres'
-      - 'django'
+      - postgres
+      - django
     environment:
-      HASURA_GRAPHQL_ENABLE_CONSOLE: 'true'
-      HASURA_GRAPHQL_DEV_MODE: 'true'
-      HASURA_GRAPHQL_UNAUTHORIZED_ROLE: 'public'
-      HASURA_GRAPHQL_DATABASE_URL: 'postgres://postgres:password@postgres:5432/postgres'
-      HASURA_GRAPHQL_ADMIN_SECRET: 'password'
+      HASURA_GRAPHQL_ENABLE_CONSOLE: "true"
+      HASURA_GRAPHQL_DEV_MODE: "true"
+      HASURA_GRAPHQL_UNAUTHORIZED_ROLE: "public"
+      HASURA_GRAPHQL_DATABASE_URL: "postgres://malik:pass1234@postgres:5432/ecom"
+      HASURA_GRAPHQL_ADMIN_SECRET: "admin1234"
       # Any $ in your secret key needs another $ for interpolation. > ex. `...4v$0n^c...` becomes `...4v$$0n^c...` (read readme.md)
       HASURA_GRAPHQL_JWT_SECRET: '{ "type": "HS256", "key": "T2uy8pg3OjW26TdngnPA3LjuPlthW8AH6xIOBXu9oFs" }'
     ports:
       - "127.0.0.1:8080:8080"
-
